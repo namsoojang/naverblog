@@ -1,0 +1,40 @@
+# 네이버 블로그 주소 --> 본문 읽기
+
+import requests
+from bs4 import BeautifulSoup
+
+def get_html(url):
+    '''
+    url 주소 넣으면 html을 리턴한다
+    '''
+    user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) " +\
+        "AppleWebKit/537.36 (KHTML, like Gecko) " + \
+        "Chrome/37.0.2062.94 Safari/537.36"
+    headers = {"User-Agent": user_agent}
+    response=requests.get(url, headers=headers)
+    html=response.text
+    return html
+
+
+def get_texts(url):
+    '''
+    블로그 url 주소를 넣으면 본문의 텍스트를 문자열에 저장한다
+    
+    '''
+        
+    html=get_html(url)
+    soup=BeautifulSoup(html,"lxml")
+    texts=""
+    body_contents=soup.find("div", attrs={'class':'post_ct'})
+    for content in body_contents.find_all('p'):
+        text=content.text
+        texts+=' '+text
+ 
+    return(texts)
+
+url="https://m.blog.naver.com/PostView.nhn?blogId=jfkd0928&logNo=221028219445&proxyReferer=https%3A%2F%2Fm.search.naver.com%2Fsearch.naver%3Fwhere%3Dm_blog%26sm%3Dmtb_jum%26query%3D%25ED%2597%25A4%25EB%259D%25BC"
+texts=get_texts(url)
+print(texts)
+print(len(texts))
+
+   
