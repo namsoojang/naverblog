@@ -1,7 +1,33 @@
-#블로그 url --> 
+'''
+블로그 url이 저장파일 --> 블로그별 본문 --> 파일에 저장
+'''
+
 
 import requests
 from bs4 import BeautifulSoup
+import time
+
+SEARCH_WORDS= ['설화수','헤라','라네즈','마몽드','려','미쟝센','해피바스','에스티로드', \
+               '후','YSL', 'Dior', '크리니크', '비오템', '더페이스샵', 'AHC', '리엔', '엘라스틴', '온더바디']
+
+def make_input_file(word):
+    '''
+    네이버 검색결과(블로그 url)가 저장된 파일명을 지정한다
+    '''
+    inputfile="./naverblogs/NaverSearchResult_"+word+".txt"
+    
+    return inputfile
+
+
+def make_output_file(word):
+    '''
+    블로그별 본문내용을 저장할 파일명을 지정한다
+    '''
+    outputfile="./naverblogs/blogs_texts_"+word+".txt"
+    
+    return outputfile
+
+
 
 def get_html(url):
     '''
@@ -16,6 +42,7 @@ def get_html(url):
     
     return html
 
+
 def get_texts(url):
     '''
     url 주소를 넣으면 블로그 본문을 읽어준다
@@ -27,10 +54,23 @@ def get_texts(url):
     texts=""
     for products in soup.find_all("div",class_="post_ct"):
         texts+=' '+products.get_text()
-    
     return texts
+      
+
+for word in SEARCH_WORDS:
+    inputfile=make_input_file(word)
+    texts=[]
+
+    with open(inputfile, "r", encoding="utf-8") as input_file:
+        for url in input_file:
+            texts.append(get_texts(url))
+            print(word,texts[:20])
+            time.sleep(0.3)
+        time.sleep(0.5)
          
-
-url="https://m.blog.naver.com/PostView.nhn?blogId=jfkd0928&logNo=221028219445&proxyReferer=https%3A%2F%2Fm.search.naver.com%2Fsearch.naver%3Fwhere%3Dm_blog%26sm%3Dmtb_jum%26query%3D%25ED%2597%25A4%25EB%259D%25BC"
-
-print(get_texts(url))
+    outputfile=make_output_file(word)
+    with open(outputfile, "w", encoding="utf-8") as output_file:
+        for text in texts:
+            print(text, file=output_file)
+    print(word, len(texts))
+    
