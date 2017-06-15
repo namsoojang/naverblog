@@ -1,5 +1,5 @@
 '''
-네이버 브랜드 검색 --> 블로그 url 찾기 --> 검색어별파일로저장
+네이버 브랜드 검색 --> 블로그 url 찾기 --> 파
 '''
 
 import requests
@@ -52,8 +52,9 @@ def make_output_file(word):
     
 
 for word in SEARCH_WORDS:
-    pageurl=get_blogs_url(word)
-    print(word, len(pageurl))
+    pageurls=get_blogs_url(word)
+    print(word, len(pageurls))
     outputfile=make_output_file(word)
     with open(outputfile, "w", encoding="utf-8") as output_file:
-        print(pageurl, file=output_file)
+        for pageurl in pageurls:
+            print(pageurl, file=output_file)
