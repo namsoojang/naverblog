@@ -49,21 +49,21 @@ def get_texts(url):
     
     html_url=get_html(url)
     soup=BeautifulSoup(html_url,"lxml")
-    texts=[]
+    texts=""
     for products in soup.find_all("div",attrs={'class':'post_ct'}):
-        texts.append(products.get_text().replace("\n"," ").replace("\u200b"," ").replace("\xa0"," "))
+        texts+=products.get_text().replace("\n"," ").replace("\u200b"," ").replace("\xa0"," ")
     
     return texts
 
     
 for word in SEARCH_WORDS:
     inputfile=make_input_file(word)
-    texts=[]
+    texts=""
 
     with open(inputfile, "r", encoding="utf-8") as input_file:
         for url in input_file:
             text=get_texts(url)
-            texts.append(text)
+            texts+=text
             time.sleep(3)
             print(word,url,len(text)) #현재진도점검용
         time.sleep(5)
