@@ -1,17 +1,19 @@
 '''
-네이버 브랜드 검색 --> 블로그 url 찾기
+네이버 브랜드 검색 --> 블로그 url 찾기 --> 검색어별파일로저장
 '''
 
 import requests
 from bs4 import BeautifulSoup
+import time
 
 NAVER_SERCH1='https://m.search.naver.com/search.naver?where=m_blog&sm=mtb_pge&query='
 NAVER_SERCH2='&display=15&st=sim&nso=&start='
 NAVER_DISPLAYNO=15    #네이버 검색결과 페이지 하나당 블로그 15개 표시
-BLOGS_NO=30     # 한 검색어 당 150개 블로그 조회 (15 배수로 지정하는 것이 좋음)
-SEARCH_WORDS="헤라"
+BLOGS_NO=300     # 한 검색어 당 블로그 조회수 (15 배수로 지정하는 것이 좋음)
+SEARCH_WORDS= ['설화수','헤라','라네즈','마몽드','려','미쟝센','해피바스','에스티로드', \
+               '후','YSL', 'Dior', '크리니크', '비오템', '더페이스샵', 'AHC', '리엔', '엘라스틴', '온더바디']
+  
 
-    
 def make_search_pageurl(word, page_no):
     '''
     검색어와 검색 페이지 번호 입력 --> 해당 검색결과 페이지 url     
@@ -35,9 +37,23 @@ def get_blogs_url(word):
         for blogs_link in blogs_links.find_all('a'):
             url=blogs_link['href']
             blogs_urls.append(url)
-        
+        time.sleep(0.7)
+    time.sleep(0.7)
     return blogs_urls
 
-pageurl=get_blogs_url(SEARCH_WORDS)
-print(pageurl)
-print(type(pageurl), len(pageurl))
+
+def make_output_file(word):
+    '''
+    검색결과를 저장할 파일명을 생성한다
+    '''
+    outputfile="./naverblogs/NaverSearchResult_"+word+".txt"
+    
+    return outputfile
+    
+
+for word in SEARCH_WORDS:
+    pageurl=get_blogs_url(word)
+    print(word, len(pageurl))
+    outputfile=make_output_file(word)
+    with open(outputfile, "w", encoding="utf-8") as output_file:
+        print(pageurl, file=output_file)
