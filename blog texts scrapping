@@ -70,8 +70,7 @@ for word in SEARCH_WORDS:
          
     outputfile=make_output_file(word)
     with open(outputfile, "w", encoding="utf-8") as output_file:
-        for text in texts:
-            print(text, file=output_file)
+        print(texts, file=output_file)
         
 
     
