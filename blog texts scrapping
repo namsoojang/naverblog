@@ -1,3 +1,5 @@
+#블로그 url --> 
+
 import requests
 from bs4 import BeautifulSoup
 
