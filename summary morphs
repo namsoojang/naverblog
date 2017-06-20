@@ -1,0 +1,87 @@
+'''
+형태소 분석 결과 합치기
+
+'''
+
+
+from collections import Counter
+from operator import itemgetter
+
+
+SEARCH_WORDS= ['설화수','헤라','라네즈','마몽드','려','미쟝센','해피바스','에스티로드', \
+               '후','YSL', 'Dior', '크리니크', '비오템', '더페이스샵', 'AHC', '리엔', '엘라스틴', '온더바디']
+
+               
+def make_input_file(word):
+    '''
+    형태소분석한 내용을 저장할 파일명을 지정한다
+    '''
+    file="./naverblogs/blogs_texts_morph_raw"+word+".txt"  #테스트 파일로 진행함
+    return file
+               
+def make_out_file(total):
+    '''
+    형태소분석한 내용을 저장할 파일명을 지정한다
+    '''
+    file="./naverblogs/blogs_texts_morph_raw_summary"+total+".txt"  #테스트 파일로 진행함
+    return file
+
+    
+def read_texts(inputfile):
+    '''
+    저장된 파일에서 형태소 분석 결과 읽기
+    '''
+    texts=[]
+    with open(inputfile,"r",encoding="utf-8") as input_file:
+        for lines in input_file:
+            texts.append(lines.replace('\n',''))
+        
+    return texts
+    
+    
+def read_morph_counter(word):
+    '''
+    리스트로 저장된 형태소 분석 결과를 dic type으로 변경함
+    '''
+    inputfile=make_input_file(word)
+    morph_count_lists=read_texts(inputfile)
+     
+    c={}
+    for morph_count_list in morph_count_lists:
+        morph_lex, morph_cat, count = morph_count_list.split('\t')
+        
+        
+        
+        c[(morph_lex, morph_cat)]=int(count)
+    print(word, len(c))
+    return c
+
+
+def sum_dic(word_dics, total_dics):
+    
+    sum_dics={}
+    for keyss in word_dics.keys():
+        if keyss in total_dics.keys():
+            sum_dics[keyss]=word_dics[keyss]+total_dics[keyss]
+        else: 
+            sum_dics[keyss]=word_dics[keyss]
+    
+    return sum_dics
+
+
+total_morph_counter={}
+for word in SEARCH_WORDS:
+    total_morph_counter_temp={}
+    c=read_morph_counter(word)    
+    total_morph_counter_temp=sum_dic(c, total_morph_counter)
+    total_morph_counter=total_morph_counter_temp
+
+print(sorted(total_morph_counter.items(), key=itemgetter(1), reverse=True))
+    # key=itemgetter(1) --> value 값 기준,  0 --> key 값 기준
+
+
+outputfile=make_out_file("total")
+with open(outputfile, "w", encoding="utf-8") as output_file:
+    c=sorted(total_morph_counter.items(), key=itemgetter(1), reverse=True)
+    for (morph_lex, morph_cat),counts in c:
+        print("{}\t{}\t{}".format(morph_lex, morph_cat,counts), file=output_file)    
