@@ -1,0 +1,86 @@
+#워드클라우드 테스트
+#형태소분석 파일 --> 불러와서 워드클라우드 진행하는 것으로 수정 진행 필요함
+
+import sys
+import matplotlib.pyplot as plt
+import wordcloud
+
+
+SEARCH_WORDS= ['_sumarrytotal']
+BACKGROUND_COLOR = "white"
+WIDTH = 800
+HEIGHT = 600
+WORDS_NUMBER=100 #상위 몇개 단어로 워드클라우드 만들지 결정
+
+
+def make_input_file(word):
+    '''
+    형태소분석한 내용을 저장할 파일명을 지정한다
+    '''
+    file="./naverblogs/blogs_texts_morph_raw"+word+".txt"  #테스트 파일로 진행함
+    return file
+    
+
+
+def read_texts(inputfile):
+    '''
+    저장된 파일에서 블로그 본문 불러오기
+    '''
+    morphs=[]
+    with open(inputfile,"r",encoding="utf-8") as input_file:
+        for lines in input_file:
+            lines_split=lines.strip().split("\t")
+            morphs.append(lines_split)
+
+    return morphs
+
+
+def generate_text(morphs):
+    text_morphs = []
+
+    for morph_lex, morph_cat, count in morphs[:WORDS_NUMBER]:
+        # 어휘 빈도를 작은 수로 조정한다.
+        count = int(round(int(count) / 10))
+        sub_text_morphs = [morph_lex] * count
+        text_morphs.extend(sub_text_morphs)
+        # 위는 아래와 같은 표현이다.
+        # text_morphs += sub_text_morphs
+
+    text=" ".join(text_morphs)
+
+    return text
+
+def draw_cloud(text):
+    
+    if sys.platform == "win32" or sys.platform == "win64":
+        font_path = "C:/Windows/Fonts/malgun.ttf"
+    elif sys.platform == "darwin":
+        font_path = "/Library/Fonts/AppleGothic.ttf"
+    
+    cloud_gen = wordcloud.WordCloud(background_color=BACKGROUND_COLOR,
+                                    width=WIDTH, height=HEIGHT,
+                                    font_path=font_path)
+    cloud = cloud_gen.generate(text)
+
+    return cloud
+
+
+def show_cloud(cloud):
+    plt.imshow(cloud)
+    plt.axis("off")
+    plt.show()
+
+
+
+for word in SEARCH_WORDS:
+    inputfile=make_input_file(word)
+    morphs=read_texts(inputfile)
+    
+    
+    print(word, morphs[:WORDS_NUMBER])
+        
+    text = generate_text(morphs)   
+    print(text[:100])
+    cloud = draw_cloud(text)
+    show_cloud(cloud)
+    
