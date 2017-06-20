@@ -23,6 +23,22 @@ def make_search_pageurl(word, page_no):
     return pageurl
 
 
+def get_html(url):
+    '''
+    url 주소 넣으면 html을 리턴한다
+    '''
+    user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) " +\
+        "AppleWebKit/537.36 (KHTML, like Gecko) " + \
+        "Chrome/37.0.2062.94 Safari/537.36"
+    headers = {"User-Agent": user_agent}
+    response=requests.get(url, headers=headers)
+    html=response.text
+    
+    return html
+
+
+
+
 def get_blogs_url(word):
     '''
     검색어 입력 --> 검색된 블로그 url 주소 
