@@ -1,0 +1,88 @@
+'''
+블로그 텍스트 --> 형태소 분절
+'''
+from konlpy.tag import Hannanum
+from konlpy.tag import Komoran
+import ujson
+from collections import Counter
+
+
+SEARCH_WORDS= ['설화수,'헤라','라네즈','마몽드','려','미쟝센','해피바스','에스티로드', \
+               '후','YSL', 'Dior', '크리니크', '비오템', '더페이스샵', 'AHC', '리엔', '엘라스틴', '온더바디']
+
+
+def make_input_file(word):
+    '''
+    블로그별 본문내용을 저장할 파일명을 지정한다
+    '''
+    inputfile="./naverblogs/blogs_texts_"+word+".txt"  
+    #inputfile="./naverblogs/blogs_texts_"+word+"_test.txt"  #테스트 파일로 진행함
+    return inputfile
+
+def make_output_file(word):
+    '''
+    형태소분석한 내용을 저장할 파일명을 지정한다
+    '''
+    file="./naverblogs/blogs_texts_morph_raw"+word+"komorantest.txt"  #테스트 파일로 진행함
+    return file
+
+
+def read_texts(inputfile):
+    '''
+    저장된 파일에서 블로그 본문 불러오기
+    '''
+    texts=''
+    with open(inputfile,"r",encoding="utf-8") as input_file:
+        texts=input_file.read()
+    return texts
+
+
+def get_morph_anal(analyzer, texts, word):
+    #sent_morph_anals = []
+    sent_morph_anals = analyzer.pos(texts)
+    
+    for morph_lex, morph_cat in sent_morph_anals:
+        
+        if morph_lex == word:
+            print(morph_lex)
+            continue
+
+        if morph_cat in ['N','M']:
+            sent_morph_anals.append((morph_lex,morph_cat))
+        elif morph_cat in ['P']:
+            sent_morph_anals.append((morph_lex+'다',morph_cat))   # 동사인 경우 V -'다' 로 정리함
+    
+            
+    return sent_morph_anals
+    
+    
+            
+def count_morphs(sent_morph_anals):
+    morph_counter=Counter(sent_morph_anals)
+   
+    return morph_counter
+
+
+for word in SEARCH_WORDS:
+    inputfile=make_input_file(word)
+    
+    searchedtext=read_texts(inputfile).strip()
+    print(len(searchedtext))
+        
+    hannanum=Hannanum()
+    ma_res=get_morph_anal(hannanum,searchedtext, word)
+    print(ma_res[:50])
+    
+    '''
+    hannanum=Komoran()
+    ma_res=get_morph_anal(hannanum,searchedtext)
+    print(ma_res[:20])
+    '''
+    
+    morph_counts=count_morphs(ma_res)
+    print(word, morph_counts.most_common(20)) #상위 형태소 표시
+    
+    outputfile=make_output_file(word)
+    with open(outputfile, "w", encoding="utf-8") as output_file:
+        for (morph_lex, morph_cat),counts in morph_counts.most_common():
+            print("{}\t{}\t{}".format(morph_lex, morph_cat,counts), file=output_file)
