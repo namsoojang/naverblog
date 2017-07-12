@@ -2,15 +2,12 @@
 naver blogs 크롤링(PC)
 '''
 
-
 import requests
 from bs4 import BeautifulSoup
 
 word='애견샴푸'  #sample
 BLOGS_NO=100     # 한 검색어 당 블로그 조회수 (10 배수로 지정하는 것이 좋음)
-SEARCH_WORDS= ['애견샴푸']
-
-
+FILE_URLS='./data/url.txt'
 
 def make_search_pageurl(word, page_no):
     '''
@@ -50,8 +47,12 @@ def get_blogs_url(word):
         urls=soup.find_all('dt')
         for us in urls:
             for u in us.select('a'):
+                print(u['href'])
                 blogs_urls.append(u['href'])
              
     return blogs_urls
 
 urls=get_blogs_url(word)
+with open(FILE_URLS, "w", encoding="utf-8") as output_file:
+    for url in urls:
+        print(url, file=output_file)
