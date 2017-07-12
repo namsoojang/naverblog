@@ -52,6 +52,29 @@ def get_blogs_url(word):
             blogs_urls.append(url.string)
 
     return blogs_urls
+    
+    
+'''
+
+def get_blogs_url(word):
+    '''
+    검색어 입력 --> 검색된 블로그 url 주소 
+    select 활용
+    '''
+    blogs_urls=[]
+    for pagenum in range(PAGENUM_START, PAGENUM_END+1):
+        print(pagenum)
+        url=make_search_pageurl(word, pagenum)
+        html=get_html(url)
+        soup=BeautifulSoup(html, 'lxml')
+        urls=soup.select_one('div.blog.section._blogBase')     
+
+        for url in urls.select('a.url'):
+            # print(url.string)
+            blogs_urls.append(url.string)
+
+    return blogs_urls
+'''
 
 
 urls=get_blogs_url(word)
