@@ -5,10 +5,18 @@ naver blogs 크롤링(PC)
 import requests
 from bs4 import BeautifulSoup
 
-word='애견샴푸'  #sample
+word='설화수'  #sample
 PAGENUM_START=1
-PAGENUM_END=1    # 한 페이지당 블로그 10개씩 조회
+PAGENUM_END=50    # 한 페이지당 블로그 10개씩 조회
 FILE_URLS='./data/url.txt'
+
+
+def outputfile(word):
+    
+    output='./data/url_'+word+'.txt'
+    
+    return output
+
 
 def make_search_pageurl(word, page_no):
     '''
@@ -38,27 +46,6 @@ def get_html(url):
 def get_blogs_url(word):
     '''
     검색어 입력 --> 검색된 블로그 url 주소 
-    '''
-    blogs_urls=[]
-    for pagenum in range(PAGENUM_START, PAGENUM_END+1):
-        print(pagenum)
-        url=make_search_pageurl(word, pagenum)
-        html=get_html(url)
-        soup=BeautifulSoup(html, 'lxml')
-        urls=soup.find('div', {'class':'blog section _blogBase'})     
-
-        for url in urls.find_all('a', {'class':'url'}):
-            # print(url.string)
-            blogs_urls.append(url.string)
-
-    return blogs_urls
-    
-    
-'''
-
-def get_blogs_url(word):
-    '''
-    검색어 입력 --> 검색된 블로그 url 주소 
     select 활용
     '''
     blogs_urls=[]
@@ -74,10 +61,9 @@ def get_blogs_url(word):
             blogs_urls.append(url.string)
 
     return blogs_urls
-'''
-
 
 urls=get_blogs_url(word)
-with open(FILE_URLS, "w", encoding="utf-8") as output_file:
+file=outputfile(word)
+with open(file, "w", encoding="utf-8") as output_file:
     for url in urls:
         print(url, file=output_file)
