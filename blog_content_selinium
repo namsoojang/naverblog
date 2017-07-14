@@ -1,0 +1,69 @@
+'''
+네이버 블로그 본문 가져오기
+selinium 활용하여 frame  형태도 데이터 가져오기
+
+'''
+
+
+import requests
+from bs4 import BeautifulSoup
+import time
+from selenium import webdriver
+
+
+FILE_URLS='./data/selenium_text_contents.txt'
+
+urls=[
+    'http://blog.naver.com/amj3/221027511088',
+    'http://blog.naver.com/leemomo0216/221038744758',
+    'http://blog.naver.com/thdthd315/220834037962',
+    'http://blog.naver.com/dlagywjd84/220989765052',
+    'http://rlasodaussla.blog.me/220764809550'
+    ]
+
+
+
+def get_html(url):
+    '''
+    url 주소 넣으면 html을 리턴한다
+    '''
+    user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) " +\
+        "AppleWebKit/537.36 (KHTML, like Gecko) " + \
+        "Chrome/37.0.2062.94 Safari/537.36"
+    headers = {"User-Agent": user_agent}
+    response=requests.get(url, headers=headers)
+    html=response.text
+    
+    return html
+
+
+
+
+blogs_contents=[]
+
+for url in urls:
+    
+    browser=webdriver.Chrome('c:/Users/namso_000/Downloads/chromedriver')
+    # chromedrive 설치한 위치 지정해주기
+    # https://chromedriver.storage.googleapis.com/index.html?path=2.30/   여기서 다운받기
+    
+    browser.implicitly_wait(3)
+    browser.get(url)
+    
+    browser.switch_to.frame("mainFrame")
+    html=browser.page_source
+    
+    soup=BeautifulSoup(html, "lxml")
+    contents=soup.select('#postViewArea span')
+    blog_content=''
+    for content in contents:
+        blog_content+=' '+content.text.strip()
+    
+    blogs_contents.append([url, blog_content])
+    print(url, blog_content)
+    browser.quit()
+    time.sleep(1)
+
+with open(FILE_URLS, "w", encoding="utf-8") as output_file:
+    for blogs_content in blogs_contents:
+        print(blogs_content, file=output_file)
