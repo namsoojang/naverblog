@@ -1,0 +1,53 @@
+'''
+pandas, plot
+'''
+
+
+
+
+
+# -*- coding: utf-8 -*-
+import pandas as pd
+import matplotlib.pyplot as plt
+
+shop=pd.read_excel("internetshop.xlsx", index_col='번호', encoding='utf-8')
+
+
+BRANDS=["설화수","에스티로더","후","SK2","헤라","YSL","디올","오휘","프리메라","키엘","빌리프",\
+        "메이크온","클라리소닉","라네즈","마몽드","아이오페","한율","크리니크","바이탈뷰티","정관장",\
+        "GNC","록시땅","려","미쟝센","해피바스","일리","리엔","엘라스틴","온더바디","아토팜","TS샴푸",\
+        "그린핑거","존슨즈","피지오겔","더페이스샵","비오템","AHC","이자녹스","미샤","수려한"]
+COLS=['할인율', '프로모션투입률', '소비자가기준투입률']
+
+XLABEL={'할인율':"discount(%)", '프로모션투입률':"promotion(%)", '소비자가기준투입률':'total(%)'}
+
+
+def makeplot(brand,col):
+    fig=plt.figure()
+    data=shop[shop['브랜드']==brand][col]
+    plt.hist(data, bins=20)
+    plt.xlabel(XLABEL[col])
+    plt.ylabel('#ofsales')
+    medi_value=data.median()
+    max_value=data.max()
+    min_value=data.min()
+    mean_value=data.mean()
+    std_value=data.std()
+    meanbelow=data[data<=mean_value].count()    #평균보다 적은 실적을 가진 데이터 수 
+    totalcounts=data.count()                    # 전체 데이터 수
+    coverage=meanbelow/totalcounts
+    
+    #print("%s %s 평균(%.0f%%)이하에 포함되는 비율은 %.0f%%" %(brand, col, mean_value, coverage*100))
+    print(brand, col, min_value, medi_value, max_value, mean_value, coverage, meanbelow, totalcounts, std_value)
+    #plt.show()
+    filename="./histogram/%s_%s_histogram.png" %(brand,col)
+    fig.savefig(filename)
+    plt.close()
+       
+
+for brand in BRANDS:
+    for col in COLS:
+        makeplot(brand,col)
+
+
+#makeplot("설화수","할인률")
