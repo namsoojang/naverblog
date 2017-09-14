@@ -1,0 +1,19 @@
+import requests
+from bs4 import BeautifulSoup as bs
+
+#test url
+url='http://shopping.naver.com/search/all.nhn?origQuery=%EC%95%84%EC%9D%B4%EC%98%A4%ED%8E%98%20%EC%97%90%EC%96%B4%EC%BF%A0%EC%85%98%20%EC%9D%B8%ED%85%90%EC%8A%A4%EC%BB%A4%EB%B2%84&pagingIndex=2&pagingSize=40&viewType=list&sort=rel&frm=NVSHPAG&query=%EC%95%84%EC%9D%B4%EC%98%A4%ED%8E%98%20%EC%97%90%EC%96%B4%EC%BF%A0%EC%85%98%20%EC%9D%B8%ED%85%90%EC%8A%A4%EC%BB%A4%EB%B2%84'
+
+response = requests.get(url)
+html=response.text        #html
+
+
+soup=bs(html, 'lxml')
+
+#광고 상품 정보
+product_lists=soup.find_all('div', class_="info")
+for product in product_lists:
+    title=product.select('a.tit')[0].text.strip()
+    url=product.select('a')[0]['href']
+    price=product.select('span.price > em > span')[0].text
+    print("%s \\\ %s \\\ %s" %(title, price, url))
